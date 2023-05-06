@@ -1,0 +1,1235 @@
+<!DOCTYPE html> <!-- Autor: Arturo Sáenz-->
+<html>
+<head>
+    <title> Tic tac toe </title>
+    <meta charset="UTF-8">
+    <!-- Include sweetalert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Include jQuery library -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Include Backstretch JS plugin -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-backstretch/2.0.4/jquery.backstretch.min.js"></script>
+
+    <style>
+
+        .btn {
+            background-color: #b593ab;
+            width: 50px;
+            height: 50px;
+            margin: 25px;
+            border-color: antiquewhite;
+        }
+
+        .human {
+            background-color: #2a4487;
+        }
+
+        .machine {
+            background-color: black;
+        }
+
+        body {
+            background-color: black;
+        }
+    </style>
+</head>
+<body>
+    
+    <script>
+
+        jQuery(document).ready(function () {
+            start();
+            $.backstretch([
+                "https://color-hex.org/colors/000000.png",
+                "https://color-hex.org/colors/805382.png",
+                "https://color-hex.org/colors/294d65.png",
+                "https://color-hex.org/colors/759667.png", 
+                "https://color-hex.org/colors/d3718d.png"
+            ], {
+                fade: 3000,
+                duration: 5000
+            }
+            );
+        });
+
+        function start() {
+            Swal.fire({
+                imageUrl: 'https://media.tenor.com/vZyKVhAGSSkAAAAd/waiting-tom-and-jerry.gif',
+                imageWidth: 400,
+                imageHeight: 200,
+                title: 'Do you wanna start?',
+                showCancelButton: true,
+                confirmButtonText: 'Yes',
+                cancelButtonText: 'No',
+                reverseButtons: true,
+                allowOutsideClick: false,
+                background: '#805382',
+                color: '#000000'
+            }).then((result) => {
+                ticTacToe();
+                if (result.isConfirmed)
+                    habilitar(true);
+                else
+                    habilitar(false);
+            });
+        }
+
+        function loseNotification() {
+            Swal.fire({
+                imageUrl: 'https://media.tenor.com/8rYvToRbFGMAAAAd/tom-and.gif',
+                imageWidth: 400,
+                imageHeight: 200,
+                title: 'You lose!',
+                showCancelButton: false,
+                confirmButtonText: 'Restart :(',
+                allowOutsideClick: false,
+                background: '#294d65',
+                color: '#000000'
+            }).then(() => {
+                start();
+            });
+        }
+
+        function tiedNotification() {
+            Swal.fire({
+                imageUrl: 'https://media.tenor.com/ehO-xP500jAAAAAC/gun-to-head-kill-me.gif',
+                imageWidth: 400,
+                imageHeight: 200,
+                title: 'We are tied...',
+                showCancelButton: false,
+                confirmButtonText: 'Restart',
+                allowOutsideClick: false,
+                background: '#759667',
+                color: '#000000'
+            }).then(() => {
+                start();
+            });
+        }
+
+        function winNotification(){
+            Swal.fire({
+                imageUrl: 'https://gifdb.com/images/high/rage-tom-cat-head-explosion-vig8axnmrhkgn2e2.gif',
+                imageWidth: 400,
+                imageHeight: 200,
+                title: 'Congratulations, you win!',
+                showCancelButton: false,
+                confirmButtonText: 'Restart :)',
+                allowOutsideClick: false,
+                background: '#d3718d',
+                color: '#000000'
+            }).then(() => {
+                start();
+            });
+        }
+
+        function ticTacToe() {
+            Swal.fire({
+                background: `url(https://media.tenor.com/DYzUq3uX1QgAAAAC/tom-and-jerry-evil.gif)
+                             no-repeat center fixed`,
+                allowOutsideClick: false,
+                confirmButtonText: 'Restart',
+                html: `<div class="form-group">
+                                <div>
+                                    <button value="" id="button1" onClick="oddChoice('button1')" class="btn btn-primary btn-sm" />
+                                    <button value="" id="button2" onClick="evenChoice('button2')" class="btn btn-primary btn-sm" />
+                                    <button value="" id="button3" onClick="oddChoice('button3')" class="btn btn-primary btn-sm" />
+                                </div>
+                                <div>
+                                    <button value="" id="button4" onClick="evenChoice('button4')" class="btn btn-primary btn-sm" />
+                                    <button value="" id="button5" onClick="evenChoice('button5')" class="btn btn-primary btn-sm" />
+                                    <button value="" id="button6" onClick="evenChoice('button6')" class="btn btn-primary btn-sm" />
+                                </div>
+                                <div>
+                                    <button value="" id="button7" onClick="oddChoice('button7')" class="btn btn-primary btn-sm" />
+                                    <button value="" id="button8" onClick="evenChoice('button8')" class="btn btn-primary btn-sm" />
+                                    <button value="" id="button9" onClick="oddChoice('button9')" class="btn btn-primary btn-sm" />
+                                </div>
+                            </div>`
+            }).then(() => {
+                start();
+            });
+        }
+
+        let human, machine, humanClass = " human", machineClass = " machine", counter, mode;
+
+        function habilitar(x) {
+
+            counter = 0;
+
+            if (x) {
+
+                mode = 0;
+                human = "X";
+                machine = "O";
+
+            } else {
+
+                mode = 1;
+                human = "O";
+                machine = "X";
+                
+                let position = parseInt(Math.random() * 9) + 1;
+
+                if (position % 2 == 0)
+                    ++position;
+
+                mark(position);
+
+            }
+
+        }
+
+        function markButton(buttonId, player, playerClass) {
+
+            document.getElementById(buttonId).value = player;
+            document.getElementById(buttonId).className += playerClass;
+            document.getElementById(buttonId).disabled = true;
+
+        }
+
+        function mark(position) {
+
+            switch (position) {
+
+
+                case 1:
+
+                    if (document.getElementById('button1').value != machine && document.getElementById('button1').value != human) {
+                        markButton('button1', machine, machineClass);
+                        return true;
+                    }
+
+                    break;
+
+                case 2:
+
+                    if (document.getElementById('button2').value != machine && document.getElementById('button2').value != human) {
+                        markButton('button2', machine, machineClass);
+                        return true;
+
+                    }
+
+                    break;
+
+                case 3:
+
+                    if (document.getElementById('button3').value != machine && document.getElementById('button3').value != human) {
+                        markButton('button3', machine, machineClass);
+                        return true;
+
+                    }
+
+                    break;
+
+                case 4:
+
+                    if (document.getElementById('button4').value != machine && document.getElementById('button4').value != human) {
+                        markButton('button4', machine, machineClass);
+                        return true;
+
+                    }
+
+                    break;
+
+                case 5:
+
+                    if (document.getElementById('button5').value != machine && document.getElementById('button5').value != human) {
+                        markButton('button5', machine, machineClass);
+                        return true;
+
+                    }
+
+                    break;
+
+                case 6:
+
+                    if (document.getElementById('button6').value != machine && document.getElementById('button6').value != human) {
+                        markButton('button6', machine, machineClass);
+                        return true;
+
+                    }
+
+                    break;
+
+                case 7:
+
+                    if (document.getElementById('button7').value != machine && document.getElementById('button7').value != human) {
+                        markButton('button7', machine, machineClass);
+                        return true;
+
+                    }
+
+                    break;
+
+                case 8:
+
+                    if (document.getElementById('button8').value != machine && document.getElementById('button8').value != human) {
+                        markButton('button8', machine, machineClass);
+                        return true;
+
+                    }
+
+                    break;
+
+                case 9:
+
+                    if (document.getElementById('button9').value != machine && document.getElementById('button9').value != human) {
+                        markButton('button9', machine, machineClass);
+                        return true;
+
+                    }
+
+                    break;
+
+            }
+
+            return false;
+
+        }
+
+        function oddChoice(x) {
+
+            markButton(x, human, humanClass);
+
+            ++counter;
+            let stop = checkWin();
+            
+            if (counter == 1 && mode == 0) {
+
+                markButton('button5', machine, machineClass);
+
+            } else if (!stop)
+                if (!tryWin())
+                    if (!defend())
+                        if (!trick())
+                            if (!play()) {
+
+                                let position;
+
+                                do {
+
+                                    position = parseInt(Math.random() * 9 + 1);
+
+                                } while (!mark(position));
+
+                            }
+
+            if (!stop)
+                checkWin();
+
+        }
+
+        function evenChoice(x) {
+
+            markButton(x, human, humanClass);
+            
+            ++counter;
+            let stop = checkWin();
+
+            if (counter == 1 && mode == 0) {
+
+                let position;
+
+                if (x != 'button5') {
+
+                    position = parseInt(Math.random() * 2 + 1);
+                    let button = 0, alternateButton = 0;
+
+                    switch (x) {
+                        case 'button2':
+
+                            button = 1;
+                            alternateButton = 3;
+
+                            break;
+
+                        case 'button4':
+
+                            button = 1;
+                            alternateButton = 7;
+
+                            break;
+
+                        case 'button6':
+
+                            button = 3;
+                            alternateButton = 9;
+
+                            break;
+
+                        case 'button8':
+
+                            button = 7;
+                            alternateButton = 9;
+
+                            break;
+
+                    }
+
+                    if (position == 1) 
+                        markButton('button' + button, machine, machineClass);
+                    else
+                        markButton('button' + alternateButton, machine, machineClass);
+
+                } else {
+
+                    do {
+
+                        position = parseInt(Math.random() * 9 + 1);
+
+                        if (position % 2 == 0)
+                            position++;
+
+                    } while (!mark(position));
+
+                }
+
+
+            } else if (!stop)
+                if (!tryWin())
+                    if (!defend())
+                        if (!play()) {
+                            
+                            let position;
+
+                            do {
+
+                                position = parseInt(Math.random() * 9 + 1);
+
+                            } while (!mark(position));
+
+                        }
+
+            if (!stop)
+                checkWin();
+
+        }
+
+        function checkWin() {
+
+            if (document.getElementById('button1').value == machine && document.getElementById('button2').value == machine &&
+                document.getElementById('button3').value == machine) {
+
+                loseNotification();
+                return true;
+
+            }
+
+            if (document.getElementById('button1').value == machine && document.getElementById('button5').value == machine &&
+                document.getElementById('button9').value == machine) {
+
+                loseNotification();
+                return true;
+
+            }
+
+            if (document.getElementById('button1').value == machine && document.getElementById('button4').value == machine &&
+                document.getElementById('button7').value == machine) {
+
+                loseNotification();
+                return true;
+
+            }
+
+            if (document.getElementById('button2').value == machine && document.getElementById('button5').value == machine &&
+                document.getElementById('button8').value == machine) {
+
+                loseNotification();
+                return true;
+
+            }
+
+            if (document.getElementById('button3').value == machine && document.getElementById('button5').value == machine &&
+                document.getElementById('button7').value == machine) {
+
+                loseNotification();
+                return true;
+
+            }
+
+            if (document.getElementById('button3').value == machine && document.getElementById('button6').value == machine &&
+                document.getElementById('button9').value == machine) {
+
+                loseNotification();
+                return true;
+
+            }
+
+            if (document.getElementById('button4').value == machine && document.getElementById('button5').value == machine &&
+                document.getElementById('button6').value == machine) {
+
+                loseNotification();
+                return true;
+
+            }
+
+            if (document.getElementById('button7').value == machine && document.getElementById('button8').value == machine &&
+                document.getElementById('button9').value == machine) {
+
+                loseNotification();
+                return true;
+
+            }
+
+            if (document.getElementById('button1').value == human && document.getElementById('button2').value == human &&
+                document.getElementById('button3').value == human) {
+
+                winNotification();
+                return true;
+
+            }
+
+            if (document.getElementById('button1').value == human && document.getElementById('button5').value == human &&
+                document.getElementById('button9').value == human) {
+
+                winNotification();
+                return true;
+
+            }
+
+            if (document.getElementById('button1').value == human && document.getElementById('button4').value == human &&
+                document.getElementById('button7').value == human) {
+
+                winNotification();
+                return true;
+
+            }
+
+            if (document.getElementById('button2').value == human && document.getElementById('button5').value == human &&
+                document.getElementById('button8').value == human) {
+
+                winNotification();
+                return true;
+
+            }
+
+            if (document.getElementById('button3').value == human && document.getElementById('button5').value == human &&
+                document.getElementById('button7').value == human) {
+
+                winNotification();
+                return true;
+
+            }
+
+            if (document.getElementById('button3').value == human && document.getElementById('button6').value == human &&
+                document.getElementById('button9').value == human) {
+
+                winNotification();
+                return true;
+
+            }
+
+            if (document.getElementById('button4').value == human && document.getElementById('button5').value == human &&
+                document.getElementById('button6').value == human) {
+
+                winNotification();
+                return true;
+
+            }
+
+            if (document.getElementById('button7').value == human && document.getElementById('button8').value == human &&
+                document.getElementById('button9').value == human) {
+
+                winNotification();
+                return true;
+
+            }
+
+            if (document.getElementById('button1').value != "" && document.getElementById('button2').value != "" &&
+                document.getElementById('button3').value != "" && document.getElementById('button4').value != "" &&
+                document.getElementById('button5').value != "" && document.getElementById('button6').value != "" &&
+                document.getElementById('button7').value != "" && document.getElementById('button8').value != "" &&
+                document.getElementById('button9').value != "") {
+
+                tiedNotification();
+                return true;
+
+            }
+
+            return false;
+
+        }
+
+        function tryWin() {
+
+            if (document.getElementById('button1').value == machine && document.getElementById('button2').value == machine &&
+                document.getElementById('button3').value == "") {
+
+                markButton('button3', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button1').value == machine && document.getElementById('button3').value == machine &&
+                document.getElementById('button2').value == "") {
+
+                markButton('button2', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button1').value == machine && document.getElementById('button5').value == machine &&
+                document.getElementById('button9').value == "") {
+
+                markButton('button9', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button1').value == machine && document.getElementById('button9').value == machine &&
+                document.getElementById('button5').value == "") {
+
+                markButton('button5', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button1').value == machine && document.getElementById('button4').value == machine &&
+                document.getElementById('button7').value == "") {
+
+                markButton('button7', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button1').value == machine && document.getElementById('button7').value == machine &&
+                document.getElementById('button4').value == "") {
+
+                markButton('button4', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button2').value == machine && document.getElementById('button3').value == machine &&
+                document.getElementById('button1').value == "") {
+
+                markButton('button1', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button2').value == machine && document.getElementById('button5').value == machine &&
+                document.getElementById('button8').value == "") {
+
+                markButton('button8', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button2').value == machine && document.getElementById('button8').value == machine &&
+                document.getElementById('button5').value == "") {
+
+                markButton('button5', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button3').value == machine && document.getElementById('button5').value == machine &&
+                document.getElementById('button7').value == "") {
+
+                markButton('button7', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button3').value == machine && document.getElementById('button7').value == machine &&
+                document.getElementById('button5').value == "") {
+
+                markButton('button5', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button3').value == machine && document.getElementById('button6').value == machine &&
+                document.getElementById('button9').value == "") {
+
+                markButton('button9', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button3').value == machine && document.getElementById('button9').value == machine &&
+                document.getElementById('button6').value == "") {
+
+                markButton('button6', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button4').value == machine && document.getElementById('button7').value == machine &&
+                document.getElementById('button1').value == "") {
+
+                markButton('button1', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button4').value == machine && document.getElementById('button5').value == machine &&
+                document.getElementById('button6').value == "") {
+
+                markButton('button6', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button4').value == machine && document.getElementById('button6').value == machine &&
+                document.getElementById('button5').value == "") {
+
+                markButton('button5', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button5').value == machine && document.getElementById('button9').value == machine &&
+                document.getElementById('button1').value == "") {
+
+                markButton('button1', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button5').value == machine && document.getElementById('button8').value == machine &&
+                document.getElementById('button2').value == "") {
+
+                markButton('button2', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button5').value == machine && document.getElementById('button7').value == machine &&
+                document.getElementById('button3').value == "") {
+
+                markButton('button3', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button5').value == machine && document.getElementById('button6').value == machine &&
+                document.getElementById('button4').value == "") {
+
+                markButton('button4', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button6').value == machine && document.getElementById('button9').value == machine &&
+                document.getElementById('button3').value == "") {
+
+                markButton('button3', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button7').value == machine && document.getElementById('button8').value == machine &&
+                document.getElementById('button9').value == "") {
+
+                markButton('button9', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button7').value == machine && document.getElementById('button9').value == machine &&
+                document.getElementById('button8').value == "") {
+
+                markButton('button8', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button8').value == machine && document.getElementById('button9').value == machine &&
+                document.getElementById('button7').value == "") {
+
+                markButton('button7', machine, machineClass);
+                return true;
+
+            }
+
+            return false;
+
+        }
+
+        function defend() {
+
+            if (document.getElementById('button1').value == human && document.getElementById('button6').value == human &&
+                document.getElementById('button8').value == human && document.getElementById('button2').value == machine &&
+                document.getElementById('button5').value == machine && document.getElementById('button7').value == "") {
+                
+                markButton('button7', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button6').value == human && document.getElementById('button7').value == human &&
+                document.getElementById('button5').value == machine && document.getElementById('button9').value == "") {
+
+                markButton('button9', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button1').value == human && document.getElementById('button2').value == human &&
+                document.getElementById('button3').value == "") {
+
+                markButton('button3', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button1').value == human && document.getElementById('button3').value == human &&
+                document.getElementById('button2').value == "") {
+
+                markButton('button2', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button1').value == human && document.getElementById('button5').value == human &&
+                document.getElementById('button9').value == "") {
+
+                markButton('button9', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button1').value == human && document.getElementById('button9').value == human &&
+                document.getElementById('button5').value == "") {
+
+                markButton('button5', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button1').value == human && document.getElementById('button4').value == human &&
+                document.getElementById('button7').value == "") {
+
+                markButton('button7', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button1').value == human && document.getElementById('button7').value == human &&
+                document.getElementById('button4').value == "") {
+
+                markButton('button4', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button2').value == human && document.getElementById('button3').value == human &&
+                document.getElementById('button1').value == "") {
+
+                markButton('button1', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button2').value == human && document.getElementById('button5').value == human &&
+                document.getElementById('button8').value == "") {
+
+                markButton('button8', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button2').value == human && document.getElementById('button8').value == human &&
+                document.getElementById('button5').value == "") {
+
+                markButton('button5', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button3').value == human && document.getElementById('button5').value == human &&
+                document.getElementById('button7').value == "") {
+
+                markButton('button7', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button3').value == human && document.getElementById('button7').value == human &&
+                document.getElementById('button5').value == "") {
+
+                markButton('button5', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button3').value == human && document.getElementById('button6').value == human &&
+                document.getElementById('button9').value == "") {
+
+                markButton('button9', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button3').value == human && document.getElementById('button9').value == human &&
+                document.getElementById('button6').value == "") {
+
+                markButton('button6', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button4').value == human && document.getElementById('button7').value == human &&
+                document.getElementById('button1').value == "") {
+
+                markButton('button1', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button4').value == human && document.getElementById('button5').value == human &&
+                document.getElementById('button6').value == "") {
+
+                markButton('button6', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button4').value == human && document.getElementById('button6').value == human &&
+                document.getElementById('button5').value == "") {
+
+                markButton('button5', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button5').value == human && document.getElementById('button9').value == human &&
+                document.getElementById('button1').value == "") {
+
+                markButton('button1', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button5').value == human && document.getElementById('button8').value == human &&
+                document.getElementById('button2').value == "") {
+
+                markButton('button2', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button5').value == human && document.getElementById('button7').value == human &&
+                document.getElementById('button3').value == "") {
+
+                markButton('button3', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button5').value == human && document.getElementById('button6').value == human &&
+                document.getElementById('button4').value == "") {
+
+                markButton('button4', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button6').value == human && document.getElementById('button9').value == human &&
+                document.getElementById('button3').value == "") {
+
+                markButton('button3', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button7').value == human && document.getElementById('button8').value == human &&
+                document.getElementById('button9').value == "") {
+
+                markButton('button9', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button7').value == human && document.getElementById('button9').value == human &&
+                document.getElementById('button8').value == "") {
+
+                markButton('button8', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button8').value == human && document.getElementById('button9').value == human &&
+                document.getElementById('button7').value == "") {
+
+                markButton('button7', machine, machineClass);
+                return true;
+
+            }
+
+            return false;
+
+        }
+
+        function trick() {
+
+            if (document.getElementById('button1').value == human && document.getElementById('button5').value == machine &&
+                document.getElementById('button6').value == human && document.getElementById('button8').value == "") {
+
+                markButton('button8', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button1').value == human && document.getElementById('button5').value == machine &&
+                document.getElementById('button8').value == human && document.getElementById('button7').value == "") {
+
+                markButton('button7', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button3').value == human && document.getElementById('button5').value == machine &&
+                document.getElementById('button7').value == human) {
+
+                markButton('button6', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button7').value == human && document.getElementById('button5').value == machine &&
+                document.getElementById('button6').value == human && document.getElementById('button9').value == "") {
+
+                markButton('button9', machine, machineClass);
+                return true;
+
+            }
+
+            if (document.getElementById('button3').value == human && document.getElementById('button5').value == machine &&
+                document.getElementById('button8').value == human && document.getElementById('button9').value == "") {
+
+                markButton('button9', machine, machineClass);
+                return true;
+
+            }
+
+            return false;
+
+        }
+
+        function play() {
+
+            if (document.getElementById('button1').value == machine) {
+
+                if (document.getElementById('button5').value == "") {
+
+                    markButton('button5', machine, machineClass);
+                    return true;
+
+                } else if (document.getElementById('button3').value == "") {
+
+                    markButton('button3', machine, machineClass);
+                    return true;
+
+                } else if (document.getElementById('button7').value == "") {
+
+                    markButton('button7', machine, machineClass);
+                    return true;
+
+                }
+
+            }
+
+            if (document.getElementById('button2').value == machine) {
+
+                if (document.getElementById('button5').value == "") {
+
+                    markButton('button5', machine, machineClass);
+                    return true;
+
+                } else if (document.getElementById('button1').value == "") {
+
+                    markButton('button1', machine, machineClass);
+                    return true;
+
+                } else if (document.getElementById('button3').value == "") {
+
+                    markButton('button3', machine, machineClass);
+                    return true;
+
+                }
+
+            }
+
+            if (document.getElementById('button3').value == machine) {
+
+                if (document.getElementById('button5').value == "") {
+
+                    markButton('button5', machine, machineClass);
+                    return true;
+
+                } else if (document.getElementById('button1').value == "") {
+
+                    markButton('button1', machine, machineClass);
+                    return true;
+
+                } else if (document.getElementById('button9').value == "") {
+
+                    markButton('button9', machine, machineClass);
+                    return true;
+
+                }
+
+            }
+
+            if (document.getElementById('button4').value == machine) {
+
+                if (document.getElementById('button5').value == "") {
+
+                    markButton('button5', machine, machineClass);
+                    return true;
+
+                } else if (document.getElementById('button1').value == "") {
+
+                    markButton('button1', machine, machineClass);
+                    return true;
+
+                } else if (document.getElementById('button7').value == "") {
+
+                    markButton('button7', machine, machineClass);
+                    return true;
+
+                }
+
+            }
+
+            if (document.getElementById('button5').value == machine) {
+
+                if (document.getElementById('button1').value == "") {
+
+                    markButton('button1', machine, machineClass);
+                    return true;
+
+                } else if (document.getElementById('button2').value == "" && document.getElementById('button8').value != human) {
+
+                    markButton('button2', machine, machineClass);
+                    return true;
+
+                } else if (document.getElementById('button3').value == "") {
+
+                    markButton('button3', machine, machineClass);
+                    return true;
+
+                } else if (document.getElementById('button4').value == "" && document.getElementById('button6').value != human) {
+
+                    markButton('button4', machine, machineClass);
+                    return true;
+
+                } else if (document.getElementById('button6').value == "" && document.getElementById('button4').value != human) {
+
+                    markButton('button6', machine, machineClass);
+                    return true;
+
+                } else if (document.getElementById('button7').value == "") {
+
+                    markButton('button7', machine, machineClass);
+                    return true;
+
+                } else if (document.getElementById('button8').value == "" && document.getElementById('button2').value != human) {
+
+                    markButton('button8', machine, machineClass);
+                    return true;
+
+                } else if (document.getElementById('button9').value == "") {
+
+                    markButton('button9', machine, machineClass);
+                    return true;
+
+                }
+
+            }
+
+            if (document.getElementById('button6').value == machine) {
+
+                if (document.getElementById('button5').value == "") {
+
+                    markButton('button5', machine, machineClass);
+                    return true;
+
+                } else if (document.getElementById('button3').value == "") {
+
+                    markButton('button3', machine, machineClass);
+                    return true;
+
+                } else if (document.getElementById('button9').value == "") {
+
+                    markButton('button9', machine, machineClass);
+                    return true;
+
+                }
+
+            }
+
+            if (document.getElementById('button7').value == machine) {
+
+                if (document.getElementById('button5').value == "") {
+
+                    markButton('button5', machine, machineClass);
+                    return true;
+
+                } else if (document.getElementById('button1').value == "") {
+
+                    markButton('button1', machine, machineClass);
+                    return true;
+
+                } else if (document.getElementById('button9').value == "") {
+
+                    markButton('button9', machine, machineClass);
+                    return true;
+
+                }
+
+            }
+
+            if (document.getElementById('button8').value == machine) {
+
+                if (document.getElementById('button5').value == "") {
+
+                    markButton('button5', machine, machineClass);
+                    return true;
+
+                } else if (document.getElementById('button7').value == "") {
+
+                    markButton('button7', machine, machineClass);
+                    return true;
+
+                } else if (document.getElementById('button9').value == "") {
+
+                    markButton('button9', machine, machineClass);
+                    return true;
+
+                }
+
+            }
+
+            if (document.getElementById('button9').value == machine) {
+
+                if (document.getElementById('button5').value == "") {
+
+                    markButton('button5', machine, machineClass);
+                    return true;
+
+                } else if (document.getElementById('button3').value == "") {
+
+                    markButton('button3', machine, machineClass);
+                    return true;
+
+                } else if (document.getElementById('button7').value == "") {
+
+                    markButton('button7', machine, machineClass);
+                    return true;
+
+                }
+
+            }
+
+            return false;
+
+        }
+
+    </script>
+
+</body>
+</html>
